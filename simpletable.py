@@ -7,10 +7,12 @@ This module provides simple classes and interfaces to generate simple HTML
 tables based on Python native types, such as lists.
 
 Author's website: http://matheusvportela.wordpress.com/
+
+v0.4 2019-05-24 by Walter Schwenger
 """
 
-__version__ = '0.3'
-__date__    = '2014-08-20'
+__version__ = '0.4'
+__date__    = '2019-05-24'
 __author__  = 'Matheus Vieira Portela'
 
 ### CHANGES ###
@@ -23,6 +25,9 @@ __author__  = 'Matheus Vieira Portela'
 # 2014-08-20: v0.3 MVP:
 #   - Enable SimplePage to accept a list of tables
 #   - Enable SimplePage to iterate over its tables
+# 2019-05-24: v0.4 WS:
+#   - Added SimpleTableImage class to handle adding images to tables
+#   - Added test images and image example to __main__
 
 ### TODO ###
 # 
@@ -56,6 +61,43 @@ class SimpleTableCell(object):
             return '<th>%s</th>' %(self.text)
         else:    
             return '<td>%s</td>' %(self.text)
+
+
+class SimpleTableImage(object):
+    """A table class to create table cells with an image.
+
+    Example:
+    cell = SimpleTableImage('images/image_1.jpg')
+    """
+
+    def __init__(self, image_file, width=None, height=None):
+        """Table cell constructor.
+
+        Keyword arguments:
+        image_file -- relative filepath to image file to display.
+        width -- (optional) width of the image in pixels
+        height -- (optional) height of the image in pixels
+        """
+        self.image_file = image_file
+        if width:
+            self.width=round(width)
+        else:
+            self.width=width
+        if height:
+            self.height=round(height)
+        else:
+            self.height=height
+
+    def __str__(self):
+        """Return the HTML code for the table cell with the image."""
+        output = '<img src="%s"' %(self.image_file)
+        if self.height:
+            output += ' height="%s"' %(self.height)
+        if self.width:
+            output += ' width="%s"' %(self.width)
+        output += '>'
+
+        return output
 
 
 class SimpleTableRow(object):
@@ -299,8 +341,22 @@ if __name__ == "__main__":
     table2 = SimpleTable([['Testing', 'this'], ['table', 'here']],
             css_class='mytable')
 
+    image_list = []
+    image_list.append(SimpleTableImage('images/image_1.jpg'))
+    image_list.append(SimpleTableImage('images/image_2.jpg', width=200))
+    image_list.append(SimpleTableImage('images/image_3.jpg', height=200))
+    image_list.append(SimpleTableImage('images/image_4.jpg', width=200, height=200))
+
+    table3 = SimpleTable([image_list],
+                         header_row=['No Size Specified',
+                                     'width=200',
+                                     'height=200',
+                                     'width=200, height=200'],
+                         css_class='mytable')
+
     page = HTMLPage()
     page.add_table(table1)
     page.add_table(table2)
+    page.add_table(table3)
     page.css = css
     page.save("test.html")
